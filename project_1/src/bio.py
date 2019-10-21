@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 from pprint import pformat
+from pathlib import Path
 import numpy as np
 import sys
 import json
@@ -16,6 +17,7 @@ def load_flat_file(path):
 
 
 def save_output(path, seq1, seq2, config, allignments, score_matrix):
+    Path(path).parent.mkdir(exist_ok=True, parents=True)
     with open(path, 'w', encoding='utf-8') as f:
         json.dump({
             'seq1': seq1,
@@ -146,8 +148,8 @@ def main(args):
     allignments = [get_allignments(path, seq1, seq2) for path in path_resolver.paths]
 
     for (allignment_1, allignment_2), i in zip(allignments, range(len(allignments))):
-        logging.info('[A#%04d] %s' % (i, allignment_1))
-        logging.info('[A#%04d] %s' % (i, allignment_2))
+        logging.info('[A%04d] %s' % (i, allignment_1))
+        logging.info('[A%04d] %s' % (i, allignment_2))
 
     if args.output:
         save_output(args.output, seq1, seq2, config, allignments, score_matrix)
@@ -156,10 +158,10 @@ def main(args):
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('--input1', type=str, default='in1.txt', help='Path to the file where first sequence is stored')
-    parser.add_argument('--input2', type=str, default='in2.txt', help='Path to the file where second sequence is stored')
-    parser.add_argument('--config', type=str, default='config.json', help='Path to the config file')
-    parser.add_argument('--output', type=str, default=None, help='Path to the output file. Format is json.')
+    parser.add_argument('--input1', type=str, default='../data/in1.txt', help='Path to the file where first sequence is stored.')
+    parser.add_argument('--input2', type=str, default='../data/in2.txt', help='Path to the file where second sequence is stored.')
+    parser.add_argument('--config', type=str, default='../configs/config.json', help='Path to the config file. Format must be json.')
+    parser.add_argument('--output', type=str, default=None, help='Path to the output file. Format will be json.')
     parser.add_argument('--logging', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'], help='Set the logging level', default='INFO')
     args = parser.parse_args(sys.argv[1:])
     main(args)
