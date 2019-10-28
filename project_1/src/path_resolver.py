@@ -7,7 +7,7 @@ class PathResolver():
         self.paths = []
         self.tmp_path = []
 
-    def resolve_paths(self, i, j, max_number_of_paths):
+    def resolve_paths(self, i, j, max_number_of_paths=0):
         paths = []
         tmp_path = []
         self.__resolve_paths(i, j, max_number_of_paths, paths, tmp_path)

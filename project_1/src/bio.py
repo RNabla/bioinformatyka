@@ -1,14 +1,12 @@
-from argparse import ArgumentParser
-from pprint import pformat
-from pathlib import Path
 import numpy as np
 import sys
 import json
 import logging
+from argparse import ArgumentParser
+from pprint import pformat
 from utils import load_fasta_file
 from utils import load_json
 from utils import save_output
-
 from path_resolver import PathResolver
 
 
