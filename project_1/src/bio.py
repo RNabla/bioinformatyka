@@ -10,7 +10,7 @@ from utils import save_output
 from path_resolver import PathResolver
 
 
-def solve(seq1, seq2, config):
+def solve(seq1, seq2, gap_score, diff_score, same_score):
     len1 = len(seq1) + 1
     len2 = len(seq2) + 1
     logging.info('Solving score matrix for:')
@@ -19,29 +19,29 @@ def solve(seq1, seq2, config):
     score_matrix = np.zeros((len1, len2))
     nodes_mapping = {}
     for i in range(1, len1):
-        score_matrix[i, 0] = config['gap'] * i
+        score_matrix[i, 0] = gap_score * i
         nodes_mapping[(i, 0)] = [(i-1, 0)]
     for i in range(1, len2):
-        score_matrix[0, i] = config['gap'] * i
+        score_matrix[0, i] = gap_score * i
         nodes_mapping[(0, i)] = [(0, i-1)]
 
     for depth in range(1, len1 + len2):
         for i in range(1, len1):
             j = depth - i
             if j in range(1, len2):
-                diag = score_matrix[i - 1, j - 1] + config['same'] if seq1[i - 1] == seq2[j - 1] else config['diff']
-                up = score_matrix[i - 1, j] + config['gap']
-                right = score_matrix[i, j - 1] + config['gap']
-                best_option = max(diag, up, right)
+                diag = score_matrix[i - 1, j - 1] + same_score if seq1[i - 1] == seq2[j - 1] else diff_score
+                up = score_matrix[i - 1, j] + gap_score
+                right = score_matrix[i, j - 1] + gap_score
+                best_score = max(diag, up, right)
                 parent_nodes = []
-                if diag == best_option:
+                if diag == best_score:
                     parent_nodes.append((i-1, j-1))
-                if up == best_option:
+                if up == best_score:
                     parent_nodes.append((i-1, j))
-                if right == best_option:
+                if right == best_score:
                     parent_nodes.append((i, j-1))
                 nodes_mapping[(i, j)] = parent_nodes
-                score_matrix[i, j] = best_option
+                score_matrix[i, j] = best_score
 
     return score_matrix, nodes_mapping
 
@@ -77,7 +77,7 @@ def main(args):
     if config['max_sequence_length'] != 0 and min(len(seq1), len(seq2)) > config['max_sequence_length']:
         raise ValueError('Sequence exceeded max_sequence_length ')
 
-    score_matrix, nodes_mapping = solve(seq1, seq2, config)
+    score_matrix, nodes_mapping = solve(seq1, seq2, config['gap'], config['diff'], config['same'])
 
     logging.debug('Score matrix: \n%s' % pformat(score_matrix))
     logging.debug('Nodes mapping: (target_node): [(parent_node),...]\n%s' % pformat(nodes_mapping))
