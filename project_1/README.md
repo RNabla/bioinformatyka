@@ -2,7 +2,7 @@
 
 The goal of this project is to use [Needleman–Wunsch's algorithm](https://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm) to solve sequence allignment problem.
 
-Program takes as input 2 sequences, scoring config and outputs best allignments. One allignment consists of 2 sequences of same length built from input sequences. The score of allignment is scored based on operations needed to transform input.
+Program takes as input 2 sequences saved in file with [FASTA format](https://en.wikipedia.org/wiki/FASTA_format), scoring config and outputs best allignments. One allignment consists of 2 sequences of same length built from input sequences. The score of allignment is scored based on operations needed to transform input.
 
 # Config
 
@@ -20,7 +20,7 @@ Program takes as input 2 sequences, scoring config and outputs best allignments.
 * `diff` - how many score points should be added if corresponding elements differs.
 * `gap` - how many score points should be added if one of corresponding element is empty.
 * `max_number_of_paths` - how many allignments should be outputed. 0 means all allignmens.
-* `max_sequence_length` - how long input sequence can be
+* `max_sequence_length` - how long input sequence can be. 0 means no length restrictions.
 
 # Application
 
@@ -136,4 +136,11 @@ INFO:root:[A0000] SMART-
 INFO:root:[A0001] -MARS-
 INFO:root:[A0001] SMAR-T
 INFO:root:Saved output to ../output/output.json
+```
+
+# Unit tests
+
+User can run test by issuing following command in CLI:
+```bash
+python -m unittest discover -p "*_test.py"
 ```
