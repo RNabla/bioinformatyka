@@ -5,27 +5,11 @@ import numpy as np
 import sys
 import json
 import logging
+from utils import load_fasta_file
+from utils import load_json
+from utils import save_output
 
-def load_json(path):
-    with open(path, 'r', encoding='utf-8') as f:
-        return json.load(f)
-
-
-def load_fasta_file(path):
-    with open(path, 'r', encoding='utf-8') as f:
-        return ''.join(f.readlines()[1:]).strip()
-
-
-def save_output(path, seq1, seq2, config, allignments, score_matrix):
-    Path(path).parent.mkdir(exist_ok=True, parents=True)
-    with open(path, 'w', encoding='utf-8') as f:
-        json.dump({
-            'seq1': seq1,
-            'seq2': seq2,
-            'config': config,
-            'allignments': allignments,
-            'score_matrix': score_matrix.tolist()
-        }, f, indent=2)
+from path_resolver import PathResolver
 
 
 def solve(seq1, seq2, config):
@@ -61,48 +45,7 @@ def solve(seq1, seq2, config):
                 nodes_mapping[(i, j)] = parent_nodes
                 score_matrix[i, j] = best_option
 
-    # for depth in range(1, len1 + len2):
-    #     for i in range(1, len1):
-    #         # TODO: remove j loop
-    #         for j in range(1, len2):
-    #             if i + j == depth:
-    #                 diag = score_matrix[i - 1, j - 1] + config['same'] if seq1[i - 1] == seq2[j - 1] else config['diff']
-    #                 up = score_matrix[i - 1, j] + config['gap']
-    #                 right = score_matrix[i, j - 1] + config['gap']
-    #                 best_option = max(diag, up, right)
-    #                 parent_nodes = []
-    #                 if diag == best_option:
-    #                     parent_nodes.append((i-1, j-1))
-    #                 if up == best_option:
-    #                     parent_nodes.append((i-1, j))
-    #                 if right == best_option:
-    #                     parent_nodes.append((i, j-1))
-    #                 nodes_mapping[(i, j)] = parent_nodes
-    #                 score_matrix[i, j] = best_option
-
     return score_matrix, nodes_mapping
-
-
-class PathResolver():
-    def __init__(self, nodes_mapping, max_number_of_paths):
-        self.nodes_mapping = nodes_mapping
-        self.paths = []
-        self.tmp_path = []
-        self.max_number_of_paths = max_number_of_paths
-
-    def resolve_path(self, i, j):
-        self.tmp_path.append((i, j))
-        if i == 0 and j == 0:
-            self.paths.append(list(self.tmp_path))
-            self.tmp_path.pop()
-            return
-        parent_nodes = self.nodes_mapping[(i, j)]
-        for node in parent_nodes:
-            if self.max_number_of_paths != 0 and self.max_number_of_paths == len(self.paths):
-                logging.debug('Maximum number of paths found. Aborting further resolving')
-                return
-            self.resolve_path(node[0], node[1])
-        self.tmp_path.pop()
 
 
 def get_allignments(path, seq1, seq2):
@@ -127,13 +70,13 @@ def get_allignments(path, seq1, seq2):
 
 def main(args):
     logging.basicConfig(level=logging.getLevelName(args.logging))
-    config = load_json(args.config)
     logging.info('User args: %s' % pformat(args))
+    config = load_json(args.config)
     logging.info('Config is: \n%s' % pformat(config))
 
     seq1 = load_fasta_file(args.input1)
     seq2 = load_fasta_file(args.input2)
-    if config['max_sequence_length'] != 0 and  min(len(seq1), len(seq2)) > config['max_sequence_length']:
+    if config['max_sequence_length'] != 0 and min(len(seq1), len(seq2)) > config['max_sequence_length']:
         raise ValueError('Sequence exceeded max_sequence_length ')
 
     score_matrix, nodes_mapping = solve(seq1, seq2, config)
@@ -142,10 +85,9 @@ def main(args):
     logging.debug('Nodes mapping: (target_node): [(parent_node),...]\n%s' % pformat(nodes_mapping))
     logging.info('Alignments score: %s' % score_matrix[len(seq1), len(seq2)])
 
-    path_resolver = PathResolver(nodes_mapping, config['max_number_of_paths'])
-    path_resolver.resolve_path(len(seq1), len(seq2))
+    paths = PathResolver(nodes_mapping).resolve_paths(len(seq1), len(seq2), config['max_number_of_paths'])
 
-    allignments = [get_allignments(path, seq1, seq2) for path in path_resolver.paths]
+    allignments = [get_allignments(path, seq1, seq2) for path in paths]
 
     for (allignment_1, allignment_2), i in zip(allignments, range(len(allignments))):
         logging.info('[A%04d] %s' % (i, allignment_1))
@@ -164,5 +106,7 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=str, default=None, help='Path to the output file. Format will be json.')
     parser.add_argument('--logging', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'], help='Set the logging level', default='INFO')
     args = parser.parse_args(sys.argv[1:])
-    main(args)
-
+    try:
+        main(args)
+    except Exception as ex:
+        logging.critical(ex)

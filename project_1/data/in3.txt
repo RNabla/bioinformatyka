@@ -1,1 +1,2 @@
+>SEQUENCE 1
 SUM
