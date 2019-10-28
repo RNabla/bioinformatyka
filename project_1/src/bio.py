@@ -11,9 +11,9 @@ def load_json(path):
         return json.load(f)
 
 
-def load_flat_file(path):
+def load_fasta_file(path):
     with open(path, 'r', encoding='utf-8') as f:
-        return f.read()
+        return ''.join(f.readlines()[1:]).strip()
 
 
 def save_output(path, seq1, seq2, config, allignments, score_matrix):
@@ -131,8 +131,8 @@ def main(args):
     logging.info('User args: %s' % pformat(args))
     logging.info('Config is: \n%s' % pformat(config))
 
-    seq1 = load_flat_file(args.input1)
-    seq2 = load_flat_file(args.input2)
+    seq1 = load_fasta_file(args.input1)
+    seq2 = load_fasta_file(args.input2)
     if min(len(seq1), len(seq2)) > config['max_sequence_length']:
         raise ValueError('Sequence exceeded max_sequence_length ')
 
