@@ -92,7 +92,13 @@ def main(args):
         logging.info('[A%04d] %s' % (i, allignment_2))
 
     if args.output:
-        save_output(args.output, seq1, seq2, config, allignments, score_matrix)
+        save_output(args.output, {
+            'seq1': seq1,
+            'seq2': seq2,
+            'config': config,
+            'allignments': allignments,
+            'score_matrix': score_matrix.tolist()
+        })
         logging.info('Saved output to %s' % args.output)
 
 
