@@ -44,7 +44,7 @@ optional arguments:
 
 Input:
 ```bash
-python bio.py  --loggin INFO --input1 ../data/in1.txt --input2 ../data/in2.txt --output ../output/output.json
+python bio.py  --logging INFO --input1 ../data/in1.txt --input2 ../data/in2.txt --output ../output/output.json
 ```
 
 Output:
