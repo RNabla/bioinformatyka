@@ -29,7 +29,7 @@ def solve(seq1, seq2, gap_score, diff_score, same_score):
         for i in range(1, len1):
             j = depth - i
             if j in range(1, len2):
-                diag = score_matrix[i - 1, j - 1] + same_score if seq1[i - 1] == seq2[j - 1] else diff_score
+                diag = score_matrix[i - 1, j - 1] + (same_score if seq1[i - 1] == seq2[j - 1] else diff_score)
                 up = score_matrix[i - 1, j] + gap_score
                 right = score_matrix[i, j - 1] + gap_score
                 best_score = max(diag, up, right)

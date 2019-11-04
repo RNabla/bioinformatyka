@@ -9,7 +9,7 @@ def load_json(path):
 
 def load_fasta_file(path):
     with open(path, 'r', encoding='utf-8') as f:
-        return ''.join(f.readlines()[1:]).strip()
+        return ''.join(f.readlines()[1:]).strip().replace('\n', '')
 
 
 def save_output(path, data):
