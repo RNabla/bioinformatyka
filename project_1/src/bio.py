@@ -35,14 +35,14 @@ def solve(seq1, seq2, gap_score, diff_score, same_score):
             if j in range(1, len2):
                 diag = score_matrix[i - 1, j - 1] + (same_score if seq1[i - 1] == seq2[j - 1] else diff_score)
                 up = score_matrix[i - 1, j] + gap_score
-                right = score_matrix[i, j - 1] + gap_score
-                best_score = max(diag, up, right)
+                left = score_matrix[i, j - 1] + gap_score
+                best_score = max(diag, up, left)
                 parent_nodes = []
                 if diag == best_score:
                     parent_nodes.append((i-1, j-1))
                 if up == best_score:
                     parent_nodes.append((i-1, j))
-                if right == best_score:
+                if left == best_score:
                     parent_nodes.append((i, j-1))
                 nodes_mapping[(i, j)] = parent_nodes
                 score_matrix[i, j] = best_score
