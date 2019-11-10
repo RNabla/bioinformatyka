@@ -5,7 +5,7 @@ import logging
 from argparse import ArgumentParser
 from pprint import pformat
 from utils import load_fasta_file
-from utils import load_json
+from utils import load_config_from_json_file
 from utils import save_output
 from path_resolver import PathResolver
 
@@ -73,7 +73,7 @@ def get_allignments(path, seq1, seq2):
 def main(args):
     logging.basicConfig(level=logging.getLevelName(args.logging))
     logging.info('User args: %s' % pformat(args))
-    config = load_json(args.config)
+    config = load_config_from_json_file(args.config, ['gap', 'same', 'diff', 'max_number_of_paths', 'max_sequence_length'])
     logging.info('Config is: \n%s' % pformat(config))
 
     seq1 = load_fasta_file(args.input1)

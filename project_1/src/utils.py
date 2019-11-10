@@ -2,9 +2,17 @@ import json
 from pathlib import Path
 
 
-def load_json(path):
+def assert_required_keys(dict_obj, required_keys):
+    for key in required_keys:
+        if key not in dict_obj:
+            raise KeyError(f'config must have \'{key}\' value specified')
+
+
+def load_config_from_json_file(path, required_keys=[]):
     with open(path, 'r', encoding='utf-8') as f:
-        return json.load(f)
+        config = json.load(f)
+        assert_required_keys(config, required_keys)
+        return config
 
 
 def load_fasta_file(path):
