@@ -10,12 +10,7 @@ from utils import save_output
 from path_resolver import PathResolver
 
 
-def solve(seq1, seq2, gap_score, diff_score, same_score):
-    len1 = len(seq1) + 1
-    len2 = len(seq2) + 1
-    logging.info('Solving score matrix for:')
-    logging.info('Sequence 1: %s' % seq1)
-    logging.info('Sequence 2: %s' % seq2)
+def get_init_score_matrix(len1, len2, gap_score):
     score_matrix = np.zeros((len1, len2))
     nodes_mapping = {}
     for i in range(1, len1):
@@ -24,7 +19,16 @@ def solve(seq1, seq2, gap_score, diff_score, same_score):
     for i in range(1, len2):
         score_matrix[0, i] = gap_score * i
         nodes_mapping[(0, i)] = [(0, i-1)]
+    return score_matrix, nodes_mapping
 
+
+def solve(seq1, seq2, gap_score, diff_score, same_score):
+    len1 = len(seq1) + 1
+    len2 = len(seq2) + 1
+    logging.info('Solving score matrix for:')
+    logging.info('Sequence 1: %s' % seq1)
+    logging.info('Sequence 2: %s' % seq2)
+    score_matrix, nodes_mapping = get_init_score_matrix(len1, len2, gap_score)
     for depth in range(1, len1 + len2):
         for i in range(1, len1):
             j = depth - i
