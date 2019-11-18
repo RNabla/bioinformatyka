@@ -78,7 +78,7 @@ def main(args):
 
     seq1 = load_fasta_file(args.input1)
     seq2 = load_fasta_file(args.input2)
-    if config['max_sequence_length'] != 0 and min(len(seq1), len(seq2)) > config['max_sequence_length']:
+    if config['max_sequence_length'] != 0 and max(len(seq1), len(seq2)) > config['max_sequence_length']:
         raise ValueError('Sequence exceeded max_sequence_length ')
 
     score_matrix, nodes_mapping = solve(seq1, seq2, config['gap'], config['diff'], config['same'])
